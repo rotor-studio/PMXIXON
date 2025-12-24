@@ -1438,7 +1438,7 @@ async function refreshData() {
         ? `${officialStations.length}${officialLabel}`
         : "no disponible";
     const officialHint = officialError ? ` (${officialError})` : "";
-    statusEl.textContent = `Sensores: ${sensors.length}${communityLabel} · Estaciones oficiales: ${officialStatus}${officialHint}`;
+    statusEl.textContent = `Sensores: ${sensors.length}${communityLabel} · Estaciones oficiales: ${officialStatus}${officialHint} · Centro: Gijón (Asturias) · Radio 6km`;
     openPanels.forEach((panelState, sensorId) => {
       const updated =
         sensors.find((sensor) => sensor.id === sensorId) ||
