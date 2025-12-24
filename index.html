@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PMXIXON · Sensores de aire en Gijón</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Roboto+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/deck.gl@8.9.31/dist.min.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/d3-delaunay@6.0.4/dist/d3-delaunay.min.js"></script>
+    <link
+      href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div>
+          <h1>Que aire respiramos en Gijón/Xixón</h1>
+          <p class="subtitle">
+            Lecturas de PM2.5, PM10, NO, NO2, humedad, presión y temperatura en tiempo real.
+          </p>
+        </div>
+        <div class="controls">
+          <button id="toggle-rotate">Rotación: OFF</button>
+          <div class="slider-wrap hidden" id="rotate-control">
+            <label for="rotate-speed">Velocidad</label>
+            <input id="rotate-speed" type="range" min="0.001" max="0.05" step="0.001" value="0.005" />
+          </div>
+          <button id="toggle-terrain">Relieve: ON</button>
+          <button id="toggle-labels">Banderas: ON</button>
+          <button id="toggle-mesh">Malla: OFF</button>
+          <button id="toggle-wind">Viento: OFF</button>
+        </div>
+      </header>
+      <main>
+        <section class="hud">
+          <div class="status" id="status">Cargando sensores…</div>
+          <div class="legend">
+            <div class="aqi-scale">
+              <div class="aqi-item">
+                <span class="aqi-box level-1"></span>
+                <span>Buena</span>
+              </div>
+              <div class="aqi-item">
+                <span class="aqi-box level-2"></span>
+                <span>Aceptable</span>
+              </div>
+              <div class="aqi-item">
+                <span class="aqi-box level-3"></span>
+                <span>Moderada</span>
+              </div>
+              <div class="aqi-item">
+                <span class="aqi-box level-4"></span>
+                <span>Mala</span>
+              </div>
+              <div class="aqi-item">
+                <span class="aqi-box level-5"></span>
+                <span>Muy mala</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <div class="map-wrap">
+          <div id="map"></div>
+          <canvas id="wind-canvas" class="wind-layer" aria-hidden="true"></canvas>
+          <div id="wind-legend" class="wind-legend" aria-live="polite"></div>
+          <button id="toggle-fullscreen" class="fullscreen-btn" aria-label="Pantalla completa">
+            ⤢
+          </button>
+          <div id="panels" class="panels-layer"></div>
+        </div>
+        <section class="meteo-bar" aria-label="Previsión meteorológica">
+          <div class="meteo-header">
+            <h2>Previsión meteorológica</h2>
+            <span id="meteo-updated">Actualizando…</span>
+          </div>
+          <div id="meteo-list" class="meteo-list"></div>
+        </section>
+        <section class="info-panel" aria-label="Detalles técnicos y contaminantes">
+          <div class="info-block">
+            <h2>Guía y documentación rápida</h2>
+            <p>
+              Este mapa combina sensores comunitarios y estaciones oficiales para leer la
+              calidad del aire en Gijón/Xixón. Las banderas muestran valores recientes; en las
+              estaciones oficiales las tarjetas guardan un histórico local de 24 horas (y pueden
+              precargarse desde servidor), mientras que en sensores comunitarios el histórico vive
+              en la propia base de datos del sensor. Abajo tienes un punto de partida claro para
+              entender los datos y seguir investigando.
+            </p>
+          </div>
+          <div class="info-columns">
+            <div class="info-card">
+              <h3>Qué significa cada variable</h3>
+              <ul>
+                <li><strong>PM2.5 / PM10</strong>: partículas finas; en Gijón suelen estar influenciadas por tráfico e industria (acería y actividad portuaria).</li>
+                <li><strong>NO / NO2</strong>: gases de combustión; útiles para detectar picos urbanos.</li>
+                <li><strong>Temperatura, humedad, presión</strong>: contexto meteorológico local.</li>
+                <li><strong>Viento</strong>: indica dirección y dispersión del aire.</li>
+              </ul>
+              <h4>Referencias útiles</h4>
+              <ul class="link-list">
+                <li><a href="https://www.who.int/teams/environment-climate-change-and-health/air-quality-and-health" target="_blank" rel="noopener">OMS: calidad del aire</a></li>
+                <li><a href="https://www.epa.gov/aqs/aqi" target="_blank" rel="noopener">AQI US (EPA)</a></li>
+                <li><a href="https://www.eea.europa.eu/themes/air/air-quality-and-covid19/air-quality-standards" target="_blank" rel="noopener">UE: estándares de calidad del aire</a></li>
+                <li><a href="https://sensor.community/es/" target="_blank" rel="noopener">Sensor.Community (ES)</a></li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <h3>Cómo se construye</h3>
+              <ul>
+                <li>Mapa 3D con relieve y rotación opcional.</li>
+                <li>Altura de palos proporcional a la concentración de partículas.</li>
+                <li>Malla Delaunay para leer la distribución espacial sin banderas.</li>
+                <li>Capa de viento basada en datos meteorológicos globales a 10 m.</li>
+                <li>Actualización automática cada minuto y cache local.</li>
+                <li>Colector local opcional para histórico oficial sin visitas.</li>
+                <li>Previsión meteorológica diaria en la barra bajo el mapa.</li>
+              </ul>
+              <h4>Fuentes técnicas</h4>
+              <ul class="link-list">
+                <li><a href="https://data.sensor.community/" target="_blank" rel="noopener">Sensor.Community API</a></li>
+                <li><a href="https://api-rrd.madavi.de:3000/" target="_blank" rel="noopener">Madavi Grafana</a></li>
+                <li><a href="https://maps.sensor.community/data/v1/wind.json" target="_blank" rel="noopener">Wind JSON (U/V 10m)</a></li>
+                <li><a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></li>
+                <li><a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">Nominatim (geocoding)</a></li>
+                <li><a href="https://calidaddelairews.asturias.es/RestCecoma" target="_blank" rel="noopener">AsturAire RestCecoma</a></li>
+                <li><a href="https://maplibre.org/" target="_blank" rel="noopener">MapLibre GL</a></li>
+                <li><a href="https://deck.gl/" target="_blank" rel="noopener">deck.gl</a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer>
+        <p>
+          Fuente de datos: sensor.community · Centro: Gijón (Asturias) · Radio 6km
+        </p>
+      </footer>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

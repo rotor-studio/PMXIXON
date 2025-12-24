@@ -1,0 +1,296 @@
+{
+  "official-10": {
+    "data": [
+      {
+        "t": 1766532600000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 2.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766533500000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 2.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766534400000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 2.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766535300000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 2.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766536200000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 2.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      }
+    ]
+  },
+  "official-12": {
+    "data": [
+      {
+        "t": 1766533500000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 12.3999996185303,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766534400000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 12.3999996185303,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766535300000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 12.3999996185303,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766536200000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 12.3999996185303,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      }
+    ]
+  },
+  "official-9": {
+    "data": [
+      {
+        "t": 1766532600000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": 52.0,
+        "temperature": 8.39999961853027,
+        "pressure": 1006.57000732422
+      },
+      {
+        "t": 1766533500000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": 52.0,
+        "temperature": 8.39999961853027,
+        "pressure": 1006.57000732422
+      },
+      {
+        "t": 1766534400000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": 52.0,
+        "temperature": 8.39999961853027,
+        "pressure": 1006.57000732422
+      },
+      {
+        "t": 1766535300000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": 52.0,
+        "temperature": 8.39999961853027,
+        "pressure": 1006.57000732422
+      },
+      {
+        "t": 1766536200000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": 52.0,
+        "temperature": 8.39999961853027,
+        "pressure": 1006.57000732422
+      }
+    ]
+  },
+  "official-11": {
+    "data": [
+      {
+        "t": 1766532600000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 73.0,
+        "temperature": 7.5,
+        "pressure": 1006.0
+      },
+      {
+        "t": 1766533500000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 73.0,
+        "temperature": 7.5,
+        "pressure": 1006.0
+      },
+      {
+        "t": 1766534400000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 73.0,
+        "temperature": 7.5,
+        "pressure": 1006.0
+      },
+      {
+        "t": 1766535300000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 73.0,
+        "temperature": 7.5,
+        "pressure": 1006.0
+      },
+      {
+        "t": 1766536200000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 73.0,
+        "temperature": 7.5,
+        "pressure": 1006.0
+      }
+    ]
+  },
+  "official-27": {
+    "data": [
+      {
+        "t": 1766532600000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 68.0,
+        "temperature": 9.10000038146973,
+        "pressure": 1005.0
+      },
+      {
+        "t": 1766533500000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 68.0,
+        "temperature": 9.10000038146973,
+        "pressure": 1005.0
+      },
+      {
+        "t": 1766534400000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 68.0,
+        "temperature": 9.10000038146973,
+        "pressure": 1005.0
+      },
+      {
+        "t": 1766535300000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 68.0,
+        "temperature": 9.10000038146973,
+        "pressure": 1005.0
+      },
+      {
+        "t": 1766536200000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 9.0,
+        "no": 1.0,
+        "humidity": 68.0,
+        "temperature": 9.10000038146973,
+        "pressure": 1005.0
+      }
+    ]
+  },
+  "official-30": {
+    "data": [
+      {
+        "t": 1766533500000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 14.0,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766534400000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      },
+      {
+        "t": 1766536200000,
+        "pm10": null,
+        "pm25": null,
+        "no2": 8.0,
+        "no": 1.0,
+        "humidity": null,
+        "temperature": null,
+        "pressure": null
+      }
+    ]
+  }
+}
