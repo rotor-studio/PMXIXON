@@ -1371,6 +1371,13 @@ function startRotation() {
     setWindEnabled(false);
   }
   windBtn.style.display = "none";
+  if (map) {
+    map.scrollZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+    map.doubleClickZoom.enable();
+    map.touchZoomRotate.enable();
+  }
 
   const rotate = () => {
     if (!rotating || !map) return;
@@ -1810,7 +1817,8 @@ function enableTooltip(panelState) {
   const show = (event) => {
     if (!panelState.points.length || !panelState.series.length) return;
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
+    const point = getPoint(event);
+    const x = point.x - rect.left;
     const width = rect.width;
     const paddingLeft = 36;
     const paddingRight = 32;
@@ -1852,6 +1860,9 @@ function enableTooltip(panelState) {
 
   canvas.addEventListener("mousemove", show);
   canvas.addEventListener("mouseleave", hide);
+  canvas.addEventListener("touchstart", show, { passive: true });
+  canvas.addEventListener("touchmove", show, { passive: true });
+  canvas.addEventListener("touchend", hide);
 }
 
 function formatTimestamp(value) {
