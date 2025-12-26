@@ -32,6 +32,7 @@ let lastSensors = [];
 let lastOfficialStations = [];
 let meshEnabled = false;
 let meshEdges = [];
+let meshTriangles = [];
 let officialError = null;
 let windEnabled = false;
 let windData = null;
@@ -486,9 +487,11 @@ function idSeed(id) {
 }
 
 function elevationFor(sensor) {
-  const base = Math.max(sensor.pm10 || 0, sensor.pm25 || 0, 5);
-  const jitter = (idSeed(sensor.id) * 37) % 120;
-  return (280 + base * 45 + jitter) * 2;
+  const baseValue = Math.max(sensor.pm10 || 0, sensor.pm25 || 0, 5);
+  const t = Math.max(0, Math.min((baseValue - 5) / 95, 1));
+  const baseHeight = 1000;
+  const jitter = (idSeed(sensor.id) * 31) % 120;
+  return baseHeight * (1 + t) + jitter;
 }
 
 async function loadSensors() {
@@ -1184,8 +1187,21 @@ async function setWindEnabled(enabled) {
   }
 }
 
-function buildLayers(sensors, officialStations, showLabels, edges) {
+function buildLayers(sensors, officialStations, showLabels, edges, triangles) {
   return [
+    ...(triangles && triangles.length
+      ? [
+          new deck.PolygonLayer({
+            id: "mesh-triangles",
+            data: triangles,
+            getPolygon: (d) => d.polygon,
+            getFillColor: (d) => d.color,
+            filled: true,
+            stroked: false,
+            pickable: false,
+          }),
+        ]
+      : []),
     ...(edges.length
       ? [
           new deck.LineLayer({
@@ -1322,7 +1338,10 @@ function initMap() {
   map.on("moveend", () => {
     if (!meshEnabled) return;
     meshEdges = buildMeshEdges();
-    setLayers(buildLayers(lastSensors, lastOfficialStations, labelsEnabled, meshEdges));
+    meshTriangles = buildMeshTriangles();
+    setLayers(
+      buildLayers(lastSensors, lastOfficialStations, labelsEnabled, meshEdges, meshTriangles)
+    );
   });
 
   map.on("movestart", () => {
@@ -1420,8 +1439,9 @@ async function refreshData() {
     lastOfficialStations = officialStations;
     if (meshEnabled) {
       meshEdges = buildMeshEdges();
+      meshTriangles = buildMeshTriangles();
     }
-    setLayers(buildLayers(sensors, officialStations, labelsEnabled, meshEdges));
+    setLayers(buildLayers(sensors, officialStations, labelsEnabled, meshEdges, meshTriangles));
     updateHistory([...sensors, ...officialStations]);
     const communityLatest = sensors.reduce((acc, sensor) => {
       if (!sensor.timestamp) return acc;
@@ -1509,15 +1529,17 @@ labelsBtn.addEventListener("click", () => {
     meshEnabled = false;
     meshBtn.textContent = "Malla: OFF";
     meshEdges = [];
+    meshTriangles = [];
   }
-  setLayers(buildLayers(lastSensors, lastOfficialStations, labelsEnabled, meshEdges));
+  setLayers(buildLayers(lastSensors, lastOfficialStations, labelsEnabled, meshEdges, meshTriangles));
 });
 
 meshBtn.addEventListener("click", () => {
   meshEnabled = !meshEnabled;
   meshBtn.textContent = meshEnabled ? "Malla: ON" : "Malla: OFF";
   meshEdges = meshEnabled ? buildMeshEdges() : [];
-  setLayers(buildLayers(lastSensors, lastOfficialStations, labelsEnabled, meshEdges));
+  meshTriangles = meshEnabled ? buildMeshTriangles() : [];
+  setLayers(buildLayers(lastSensors, lastOfficialStations, labelsEnabled, meshEdges, meshTriangles));
 });
 
 windBtn.addEventListener("click", () => {
@@ -1923,6 +1945,57 @@ function buildMeshEdges() {
   }
 
   return edges;
+}
+
+function buildMeshTriangles() {
+  if (!map || !window.d3) return [];
+  const combined = [...lastSensors, ...lastOfficialStations].filter(
+    (sensor) => Number.isFinite(sensor.lon) && Number.isFinite(sensor.lat)
+  );
+  if (combined.length < 3) return [];
+
+  const points = combined.map((sensor) => {
+    const point = map.project([sensor.lon, sensor.lat]);
+    return { sensor, x: point.x, y: point.y };
+  });
+
+  const delaunay = window.d3.Delaunay.from(points, (d) => d.x, (d) => d.y);
+  const triangles = [];
+  const indices = delaunay.triangles;
+  for (let i = 0; i < indices.length; i += 3) {
+    const a = points[indices[i]];
+    const b = points[indices[i + 1]];
+    const c = points[indices[i + 2]];
+    if (!a || !b || !c) continue;
+    const az =
+      a.sensor.source === "official"
+        ? elevationFor(a.sensor) * 0.5
+        : elevationFor(a.sensor);
+    const bz =
+      b.sensor.source === "official"
+        ? elevationFor(b.sensor) * 0.5
+        : elevationFor(b.sensor);
+    const cz =
+      c.sensor.source === "official"
+        ? elevationFor(c.sensor) * 0.5
+        : elevationFor(c.sensor);
+    const polygon = [
+      [a.sensor.lon, a.sensor.lat, az],
+      [b.sensor.lon, b.sensor.lat, bz],
+      [c.sensor.lon, c.sensor.lat, cz],
+    ];
+    const ca = colorFor(a.sensor);
+    const cb = colorFor(b.sensor);
+    const cc = colorFor(c.sensor);
+    const color = [
+      Math.round((ca[0] + cb[0] + cc[0]) / 3),
+      Math.round((ca[1] + cb[1] + cc[1]) / 3),
+      Math.round((ca[2] + cb[2] + cc[2]) / 3),
+      70,
+    ];
+    triangles.push({ polygon, color });
+  }
+  return triangles;
 }
 
 function renderPanel(panelState) {
