@@ -403,7 +403,8 @@ main {
 .panel-close {
   border: 1px solid var(--ink);
   background: transparent;
-  padding: 6px 10px;
+  padding: 4px 8px;
+  line-height: 1;
   font-size: 0.75rem;
   cursor: pointer;
 }
@@ -434,6 +435,27 @@ main {
   height: 10px;
   border-radius: 50%;
   display: inline-block;
+}
+
+.panel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #0f766e;
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.panel-link-row {
+  font-size: 0.75rem;
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.panel-link:hover {
+  text-decoration: underline;
 }
 
 .chart-tooltip {

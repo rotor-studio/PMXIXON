@@ -1251,7 +1251,7 @@ function buildLayers(sensors, officialStations, showLabels, edges, triangles) {
       id: "official-poles",
       data: officialStations,
       getSourcePosition: (d) => [d.lon, d.lat, 0],
-      getTargetPosition: (d) => [d.lon, d.lat, elevationFor(d) * 0.5],
+      getTargetPosition: (d) => [d.lon, d.lat, elevationFor(d)],
       getColor: (d) => colorFor(d),
       getWidth: 5,
       widthUnits: "pixels",
@@ -1280,7 +1280,7 @@ function buildLayers(sensors, officialStations, showLabels, edges, triangles) {
           new deck.TextLayer({
             id: "official-labels",
             data: officialStations,
-            getPosition: (d) => [d.lon, d.lat, elevationFor(d) * 0.5 + 50],
+            getPosition: (d) => [d.lon, d.lat, elevationFor(d) + 50],
             getText: (d) => toStationLabel(d),
             getSize: 15,
             sizeUnits: "pixels",
@@ -1699,7 +1699,7 @@ function createPanel(sensor) {
 
   const close = document.createElement("button");
   close.className = "panel-close";
-  close.textContent = "Cerrar";
+  close.textContent = "✕";
   close.addEventListener("click", (event) => {
     event.stopPropagation();
     removePanel(sensor.id);
@@ -1929,14 +1929,8 @@ function buildMeshEdges() {
       seen.add(key);
       const sourceSensor = points[i].sensor;
       const targetSensor = points[j].sensor;
-      const sourceElevation =
-        sourceSensor.source === "official"
-          ? elevationFor(sourceSensor) * 0.5
-          : elevationFor(sourceSensor);
-      const targetElevation =
-        targetSensor.source === "official"
-          ? elevationFor(targetSensor) * 0.5
-          : elevationFor(targetSensor);
+      const sourceElevation = elevationFor(sourceSensor);
+      const targetElevation = elevationFor(targetSensor);
       const source = [sourceSensor.lon, sourceSensor.lat, sourceElevation];
       const target = [targetSensor.lon, targetSensor.lat, targetElevation];
       const color = colorFor(sourceSensor);
@@ -1967,18 +1961,9 @@ function buildMeshTriangles() {
     const b = points[indices[i + 1]];
     const c = points[indices[i + 2]];
     if (!a || !b || !c) continue;
-    const az =
-      a.sensor.source === "official"
-        ? elevationFor(a.sensor) * 0.5
-        : elevationFor(a.sensor);
-    const bz =
-      b.sensor.source === "official"
-        ? elevationFor(b.sensor) * 0.5
-        : elevationFor(b.sensor);
-    const cz =
-      c.sensor.source === "official"
-        ? elevationFor(c.sensor) * 0.5
-        : elevationFor(c.sensor);
+    const az = elevationFor(a.sensor);
+    const bz = elevationFor(b.sensor);
+    const cz = elevationFor(c.sensor);
     const polygon = [
       [a.sensor.lon, a.sensor.lat, az],
       [b.sensor.lon, b.sensor.lat, bz],
@@ -2015,12 +2000,26 @@ function renderPanel(panelState) {
       ? `${addressLine} · ${timestampText}`
       : `${addressLine} · ${timestampText} · Buscando dirección…`;
   } else {
-    const addressText = panelState.address ? ` · ${panelState.address}` : "";
+    let addressText = panelState.address ? panelState.address.trim() : "";
+    const nameText = sensor.name ? sensor.name.trim() : "";
+    const normalizedAddress = normalizeName(addressText);
+    const normalizedName = normalizeName(nameText);
+    if (
+      normalizedAddress &&
+      normalizedName &&
+      normalizedAddress.includes(normalizedName)
+    ) {
+      addressText = "";
+    }
+    if (normalizedAddress === "gijon") {
+      addressText = "Gijón";
+    }
+    const addressSuffix = addressText ? ` · ${addressText}` : "";
     const baseTitle =
       sensor.source === "official" && sensor.name
         ? `Estacion ${sensor.name}`
         : `Sensor ${sensor.id}`;
-    panelState.title.textContent = `${baseTitle}${addressText}`;
+    panelState.title.textContent = `${baseTitle}${addressSuffix}`;
   }
   const history = getHistory(sensor.id);
   const points = history?.data || [];
@@ -2063,9 +2062,6 @@ function renderLegend(container, seriesList) {
 function buildCommunityEmbed(sensor) {
   const container = document.createElement("div");
   const label = document.createElement("div");
-  label.textContent = "Grafica Sensor.Community";
-  label.style.fontSize = "0.75rem";
-  label.style.color = "#2c3e45";
   label.style.marginTop = "6px";
 
   const select = document.createElement("select");
@@ -2077,6 +2073,23 @@ function buildCommunityEmbed(sensor) {
     select.appendChild(option);
   });
 
+  const openLink = document.createElement("a");
+  openLink.className = "panel-link";
+  openLink.target = "_blank";
+  openLink.rel = "noopener";
+  openLink.textContent = "Más datos";
+  const communityLink = document.createElement("a");
+  communityLink.className = "panel-link";
+  communityLink.href = "https://sensor.community/es";
+  communityLink.target = "_blank";
+  communityLink.rel = "noopener";
+  communityLink.textContent = "Sensor Community";
+  const linkWrap = document.createElement("div");
+  linkWrap.className = "panel-link-row";
+  linkWrap.appendChild(openLink);
+  linkWrap.appendChild(document.createTextNode(" | "));
+  linkWrap.appendChild(communityLink);
+
   const iframe = document.createElement("iframe");
   iframe.loading = "lazy";
   iframe.style.width = "100%";
@@ -2084,6 +2097,9 @@ function buildCommunityEmbed(sensor) {
   iframe.style.border = "0";
 
   const nodeId = sensor.nodeId || sensor.id;
+  openLink.href = `https://api-rrd.madavi.de:3000/grafana/d/GUaL5aZMA/pm-sensors-by-map-id?orgId=1&timezone=browser&var-type=sds011&var-query0=feinstaub&var-chipID=${encodeURIComponent(
+    nodeId
+  )}`;
   const setUrl = (range) => {
     const panelId = COMMUNITY_RANGE_PANELS[range] || COMMUNITY_RANGE_PANELS["24h"];
     const cacheBust = Date.now();
@@ -2099,6 +2115,7 @@ function buildCommunityEmbed(sensor) {
   container.appendChild(label);
   container.appendChild(select);
   container.appendChild(iframe);
+  container.appendChild(linkWrap);
   return container;
 }
 

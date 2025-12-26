@@ -13,6 +13,8 @@
 - Estado superior incluye hora de ultima actualizacion por tipo (icono de reloj).
 - Boton de pantalla completa flotante en esquina inferior derecha del mapa.
 - Controles se mueven bajo el mapa en movil.
+- Tarjetas comunitarias incluyen links “Más datos | Sensor Community”.
+- Boton cerrar en tarjetas es una “✕”.
 
 ## Puntos clave de la implementacion
 - Sensores comunitarios: `https://data.sensor.community/airrohr/v1/filter/area=43.5322,-5.6611,6`.
@@ -48,6 +50,7 @@
 - Malla: `toggle-mesh` solo visible cuando banderas OFF.
 - Rotacion: slider `rotate-speed` visible cuando rotacion ON.
 - Historico oficial server: `data/official_history.json` (precarga en el navegador).
+- Despliegue: copiar `Desktop/PMXIXON-deploy` al servidor (con cache-bust en index).
 
 ## Proximo paso sugerido
 - Conectar el historico oficial del servidor con la UI si se despliega en produccion.
